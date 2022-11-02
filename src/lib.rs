@@ -3,12 +3,9 @@
 #![cfg_attr(not(test), no_std)]
 #![allow(non_snake_case, non_camel_case_types, non_upper_case_globals)]
 
-pub type uint_fast64_t = u64;
-pub type uint_fast32_t = u32;
-pub type uint_fast8_t = u8;
-pub type int_fast64_t = i64;
-pub type int_fast32_t = i32;
-pub type int_fast8_t = i8;
+extern crate c99;
+
+use c99::{int_fast32_t, int_fast64_t, uint_fast32_t, uint_fast64_t, uint_fast8_t};
 
 extern "C" {
     pub fn softfloat_detectTininess_read_helper() -> uint_fast8_t;

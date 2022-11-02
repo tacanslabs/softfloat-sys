@@ -4,6 +4,7 @@
 extern crate cc;
 extern crate cc_version;
 
+use std::env;
 use cc_version::{cc_version, Version};
 use std::path::Path;
 
@@ -119,8 +120,12 @@ fn main() {
         "f64_isSignalingNaN.c",
     ];
     let specialized_source_path = softfloat_source.join(Path::new(SPECIALIZED_PATH));
+    let target_arch_path = match env::var("CARGO_CFG_TARGET_ARCH").unwrap().as_str() {
+        "wasm32" => Path::new("Wasm-Clang"),
+        _ => Path::new("Linux-x86_64-GCC"),
+    };
     builder
-        .include(softfloat_build.join(Path::new("Wasm-Clang")))
+        .include(softfloat_build.join(target_arch_path))
         .include(&specialized_source_path)
         .define("SOFTFLOAT_ROUND_ODD", None)
         .define("INLINE_LEVEL", Some("5"))
@@ -139,6 +144,9 @@ fn main() {
                 .iter()
                 .map(|file| specialized_source_path.join(Path::new(file))),
         );
+    if env::var("OPT_LEVEL").unwrap() == "0" {
+        builder.opt_level(1); // work around softfloat bug with no definition for inline functions
+    }
     builder
         .include(softfloat_source.join(Path::new("include")))
         .file(Path::new("helper.c"))
