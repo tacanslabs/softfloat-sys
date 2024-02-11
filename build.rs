@@ -8,14 +8,16 @@ use cc_version::{cc_version, Version};
 use std::env;
 use std::path::{Path, PathBuf};
 
-const SPEC_8086: &str = "8086";
-const SPEC_8086_SSE: &str = "8086-SSE";
-#[allow(unused)]
-const SPEC_ARM_VFP_V2: &str = "ARM-VFPv2";
-#[allow(unused)]
-const SPEC_ARM_VFP_V2_DEFAULT_NAN: &str = "ARM-VFPv2-defaultNaN";
-#[allow(unused)]
-const SPEC_RISCV: &str = "RISCV";
+#[cfg(feature = "8086")]
+const SPECIALIZED_PATH: &str = "8086";
+#[cfg(feature = "8086-sse")]
+const SPECIALIZED_PATH: &str = "8086-SSE";
+#[cfg(feature = "arm-vfpv2")]
+const SPECIALIZED_PATH: &str = "ARM-VFPv2";
+#[cfg(feature = "arm-vfpv2-defaultnan")]
+const SPECIALIZED_PATH: &str = "ARM-VFPv2-defaultNaN";
+#[cfg(feature = "riscv")]
+const SPECIALIZED_PATH: &str = "RISCV";
 
 fn main() {
     //
@@ -369,10 +371,8 @@ fn main() {
         "f128M_lt_quiet.c",
     ];
 
-    if cfg!(all(target_arch = "x86_64", target_os = "linux"))
-        || cfg!(target_os = "macos")
-    {
-        let specialized_source_path = softfloat_source.join(Path::new(SPEC_8086_SSE));
+    if cfg!(all(target_arch = "x86_64", target_os = "linux")) || cfg!(target_os = "macos") {
+        let specialized_source_path = softfloat_source.join(Path::new(SPECIALIZED_PATH));
         builder
             .include(softfloat_build.join(Path::new("Linux-x86_64-GCC")))
             .include(&specialized_source_path)
@@ -394,7 +394,7 @@ fn main() {
                     .map(|file| specialized_source_path.join(Path::new(file))),
             );
     } else if cfg!(all(target_arch = "wasm32")) {
-        let specialized_source_path = softfloat_source.join(Path::new(SPEC_8086));
+        let specialized_source_path = softfloat_source.join(Path::new(SPECIALIZED_PATH));
         builder
             .include(softfloat_build.join(Path::new("Wasm-Clang")))
             .include(&specialized_source_path)

@@ -13,3 +13,11 @@ repository = "https://salsa.debian.org/Kazan-team/softfloat-sys"
 bindgen = "0.61.0"
 cc = "1.0"
 cc-version = "0.1.0"
+
+[features]
+default = ["8086-sse"]
+8086 = []
+8086-sse = []
+arm-vfpv2 = []
+arm-vfpv2-defaultnan = []
+riscv = []
